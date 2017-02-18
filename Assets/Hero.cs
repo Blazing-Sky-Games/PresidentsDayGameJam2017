@@ -10,6 +10,8 @@ public class Hero : MonoBehaviour
 	public float 		TimeBetweenBullets;
 	public bullet 		BulletPrefab;
 	public float		BulletSpeed;
+	public AudioClip	FireSound;
+	public AudioClip	JumpSound;
 
     // states for MonsterLove state machine
 
@@ -32,6 +34,8 @@ public class Hero : MonoBehaviour
         m_col = GetComponent<BoxCollider2D>();
 
         m_fsm = StateMachine<HeroState>.Initialize(this);
+
+		m_audio = GetComponent<AudioSource>();
 
 		m_tranMuzzle = transform.FindChild ("gun").FindChild ("muzzle");
     }
@@ -103,6 +107,8 @@ public class Hero : MonoBehaviour
 			bullet newBullet = Instantiate (BulletPrefab);
 			newBullet.SetVelocity (new Vector2 (m_isFacingRight ? BulletSpeed : -BulletSpeed, 0));
 			newBullet.transform.position = m_tranMuzzle.position;
+
+			m_audio.PlayOneShot (FireSound);
 		}
 	}
 
@@ -207,7 +213,9 @@ public class Hero : MonoBehaviour
 
     void Jump_Enter()
     {
-        // calculate launch velocity based on desired jump height
+		m_audio.PlayOneShot (JumpSound);
+
+		// calculate launch velocity based on desired jump height
 
         m_vv = Mathf.Sqrt(-2 * Physics2D.gravity.y * MaxJumpHeight);
     }
@@ -296,4 +304,5 @@ public class Hero : MonoBehaviour
 	private Transform 					m_tranMuzzle;
 	private float						m_timeLastFire;
 	private bool						m_isFacingRight = true;
+	private AudioSource					m_audio;
 }
