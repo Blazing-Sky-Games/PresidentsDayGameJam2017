@@ -379,7 +379,7 @@ GameObject:
   - component: {fileID: 876274333}
   - component: {fileID: 876274334}
   m_Layer: 0
-  m_Name: w
+  m_Name: gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -394,7 +394,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.391, y: -0.175, z: 0}
   m_LocalScale: {x: 0.8, y: 0.2, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1449164632}
   m_Father: {fileID: 1449202814}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -822,6 +823,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1449164631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1449164632}
+  m_Layer: 0
+  m_Name: muzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1449164632
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1449164631}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 876274333}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1449202810
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,6 +967,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxJumpHeight: 4
   WalkSpeed: 10
+  TimeBetweenBullets: 0.2
+  BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
+    type: 2}
+  BulletSpeed: 50
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0

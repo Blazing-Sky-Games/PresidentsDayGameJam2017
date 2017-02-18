@@ -5,8 +5,11 @@ public class Hero : MonoBehaviour
 {
     // editor properties
 
-    public float MaxJumpHeight;
-    public float WalkSpeed;
+    public float 		MaxJumpHeight;
+    public float 		WalkSpeed;
+	public float 		TimeBetweenBullets;
+	public bullet 		BulletPrefab;
+	public float		BulletSpeed;
 
     // states for MonsterLove state machine
 
@@ -29,6 +32,8 @@ public class Hero : MonoBehaviour
         m_col = GetComponent<BoxCollider2D>();
 
         m_fsm = StateMachine<HeroState>.Initialize(this);
+
+		m_tranMuzzle = transform.FindChild ("gun").FindChild ("muzzle");
     }
 
     void Start()
@@ -63,17 +68,43 @@ public class Hero : MonoBehaviour
 
         if (h < 0)
         {
-            transform.localScale = new Vector3(-1, 1, 1);
+			m_isFacingRight = false;
+			transform.localScale = new Vector3(-1, 1, 1);
         }
         else if (h > 0)
         {
-            transform.localScale = new Vector3(1, 1, 1);
+			m_isFacingRight = true;
+			transform.localScale = new Vector3(1, 1, 1);
         }
 
         // set rb velocity
 
         m_rb.velocity = new Vector3(m_vh, m_vv, 0);
     }
+
+	// default bullet shooting behavior
+
+	void UpdateGunDefault()
+	{
+		if (Input.GetAxisRaw ("Fire") == 0)
+		{
+			// if you let go of the fire button you can fire again as soon as you press trigger again
+
+			m_timeLastFire = 0;
+		}
+		else if (Time.time - m_timeLastFire > TimeBetweenBullets)
+		{
+			// keep track of when we fired so we know when to fire again
+
+			m_timeLastFire = Time.time;
+
+			// spawn the bullet, and set its position and velocity
+
+			bullet newBullet = Instantiate (BulletPrefab);
+			newBullet.SetVelocity (new Vector2 (m_isFacingRight ? BulletSpeed : -BulletSpeed, 0));
+			newBullet.transform.position = m_tranMuzzle.position;
+		}
+	}
 
     // check if we are on ground
 
@@ -116,6 +147,7 @@ public class Hero : MonoBehaviour
     void Idle_Update()
     {
         UpdateVDefault();
+		UpdateGunDefault ();
 
         if (Input.GetButtonDown("Jump"))
         {
@@ -149,6 +181,7 @@ public class Hero : MonoBehaviour
     void Walk_Update()
     {
         UpdateVDefault();
+		UpdateGunDefault ();
 
         if (Input.GetButtonDown("Jump"))
         {
@@ -186,6 +219,7 @@ public class Hero : MonoBehaviour
         m_vv += Physics2D.gravity.y * Time.deltaTime;
 
         UpdateVDefault();
+		UpdateGunDefault ();
 
         if (Grounded() && m_vv < 0)
         {
@@ -239,6 +273,7 @@ public class Hero : MonoBehaviour
         m_vv += Physics2D.gravity.y * Time.deltaTime;
 
         UpdateVDefault();
+		UpdateGunDefault ();
 
         if (Grounded())
         {
@@ -253,9 +288,12 @@ public class Hero : MonoBehaviour
 
     // private state
 
-    private float                      m_vv;
-    private float                      m_vh;
-    private Rigidbody2D                m_rb;
-    private BoxCollider2D              m_col;
-    private StateMachine<HeroState>    m_fsm;
+    private float                      	m_vv;
+    private float                      	m_vh;
+    private Rigidbody2D                	m_rb;
+    private BoxCollider2D            	m_col;
+    private StateMachine<HeroState>		m_fsm;
+	private Transform 					m_tranMuzzle;
+	private float						m_timeLastFire;
+	private bool						m_isFacingRight = true;
 }
