@@ -1,268 +1,190 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System.Linq;
+
 public class Mob : MonoBehaviour
 {
 	// editor properties
 
-	public float MaxJumpHeight;
-	public float WalkSpeed;
-	public float TimeBetweenBullets;
-	public bullet BulletPrefab;
-	public float BulletSpeed;
-	public float BulletDelay;
-	public Ease BulletEase;
-	public Transform BulletPath;
+	public float        WalkSpeed;
 
-	public AudioClip FireSound;
-	public AudioClip JumpSound;
+    // bullet
 
-	void Awake()
+    public GameObject   BulletPrefab;
+	public float        BulletSpeed;
+	public float        BulletDelay;
+	public Ease         BulletEase;
+
+    // ai
+
+    public float        AttackRange;
+    public float        TimeBetweenBullets;
+    public float        SensorRange;
+    public LayerMask    PlayerLayer;
+    
+
+    void Awake()
 	{
 		// get components
 
 		m_rb = GetComponent<Rigidbody2D>();
 
-		m_col = GetComponent<BoxCollider2D>();
-
-		//m_fsm = StateMachine<HeroState>.Initialize(this);
-
-		m_audio = GetComponent<AudioSource>();
 		m_tranGun = transform.FindChild("gun");
-		m_tranMuzzle = transform.FindChild("gun").FindChild("muzzle");
-	}
+    }
 
-	// default root motion when nothing special is happening
+    Vector2 DirectionToTarget()
+    {
+        if (m_targetCurrent != null)
+        {
+            return m_targetCurrent.position - transform.position;
+        }
+        else
+        {
+            return Vector2.zero;
+        }
+    }
 
-	void Update()
+    Vector3[] GetBulletPath()
+    {
+        return m_tranGun
+                .FindChild("Path")
+                .Cast<Transform>()
+                .Select(child => child.position)
+                .ToArray();
+    }
+
+    void UpdateAttack()
+    {
+        m_attackTimer -= Time.deltaTime;
+
+        if (m_targetCurrent != null && 
+            DirectionToTarget().magnitude < AttackRange &&
+            m_attackTimer < 0)
+        {
+            // reset the attack timer
+
+            m_attackTimer = TimeBetweenBullets;
+
+            // fire a bullet
+
+            Vector3[] bulletPath = GetBulletPath();
+
+            GameObject newBullet = Instantiate(BulletPrefab, bulletPath[0], Quaternion.identity);
+            newBullet.transform
+                .DOPath(
+                    bulletPath,
+                    BulletSpeed,
+                    PathType.CatmullRom,
+                    PathMode.Full3D,
+                    10,
+                    Color.yellow)
+                .SetSpeedBased(true)
+                .SetDelay(BulletDelay)
+                .SetEase(BulletEase)
+                .OnStart(() => newBullet.SetActive(true))
+                .OnComplete(() => Destroy(newBullet));
+        }
+    }
+
+    void Update()
 	{
-		UpdateVDefault();
-	}
+        // clear target
 
+        m_targetCurrent = null;
 
-	public Transform targetCurrent;
-	public Vector2 targetDirection
+        // check for new current target
+
+        Collider2D[] sensorHits = Physics2D.OverlapCircleAll(transform.position, SensorRange, PlayerLayer);
+        if (sensorHits.Length > 0)
+        {
+            m_targetCurrent = sensorHits[0].transform;
+        }
+
+        // set vh. always walk towards target
+
+        int walkDirection = 0;
+        if (DirectionToTarget().x < 0)
+        {
+            walkDirection = -1;
+        }
+        else if (DirectionToTarget().x > 0)
+        {
+            walkDirection = 1;
+        }
+
+        m_vh = WalkSpeed * walkDirection;
+
+        // make sure the mob is facing the right direction
+
+        if (walkDirection < 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        // rotate the gun to point at the target
+
+        if (m_targetCurrent != null)
+        {
+            float angleToTarget = Mathf.Atan2(DirectionToTarget().y, DirectionToTarget().x) * Mathf.Rad2Deg;
+            m_tranGun.rotation = Quaternion.AngleAxis(walkDirection < 0 ? angleToTarget - 180 : angleToTarget, Vector3.forward);
+        }
+
+        // attack if we can
+
+        UpdateAttack();
+
+        // set rb velocity
+
+        m_rb.velocity = new Vector2(m_vh, m_rb.velocity.y);
+    }
+
+    // debug drawing of sesor range and attack range
+
+    void OnDrawGizmos()
 	{
-		get
-		{
-			Vector2 _dir = transform.position;
-			if (targetCurrent != null)
-			{
-				_dir =  (Vector2)targetCurrent.position - _dir ;
-			}
-			return _dir;
-		}
-	}
-	public bool targetInRange
-	{
-		get
-		{
-			bool _range = false;
-			if (targetCurrent != null)
-			{
-				Vector2 _dir = targetCurrent.position - transform.position;
-				if (_dir.magnitude < attackRange)
-				{
-					_range = true;
-				}
-			}
-			return _range;
-		}
-	}
-	public float attackRange = 5;
-	public float ai_Smarts = 1.2f;
-	public float sensorRange = 10;
-	public float sensorAngle = 0;
-	public LayerMask whatIsPlayer;
-	Collider2D[] sensorHits;
-	Vector3[] bulletPath;
-	float moveTimer = 1;
-	float attackTimer = 1;
-	void UpdateVDefault()
-	{
-		// are we deflecting the stick left, right, or not at all
-		sensorHits = Physics2D.OverlapCircleAll(transform.position, sensorRange, whatIsPlayer);
-		float xAxis = 0;
-		if (sensorHits.Length > 0 && sensorHits != null)
-		{
-			targetCurrent = sensorHits[0].transform;
-			xAxis = targetDirection.x;
-			sensorAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-			float pathAngle = Mathf.Atan2(targetDirection.y * -1, targetDirection.x * -1)  * Mathf.Rad2Deg;
-			m_tranGun.rotation = Quaternion.AngleAxis(sensorAngle, Vector3.forward);
-			BulletPath.rotation = Quaternion.AngleAxis(pathAngle, Vector3.forward);
+        // save the gizmo color so we can restor it when we are done
 
+        Color gizomColorOld = Gizmos.color;
 
-		}
-		else
-		{
-			targetCurrent = null;
-		}
-		int walkDirection = 0;
-		if (xAxis < 0)
-		{
-			walkDirection = -1;
-		}
-		else if (xAxis > 0)
-		{
-			walkDirection = 1;
-		}
+        // draw red circle to show sensor range
 
-		// set vh
+        Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(transform.position, SensorRange);
 
-		m_vh = WalkSpeed * walkDirection;
-
-		// make sure the character is facing the right direction
-
-		if (xAxis < 0)
+		if (m_targetCurrent != null)
 		{
-			m_isFacingRight = false;
-			transform.localScale = new Vector3(-1, 1, 1);
-			BulletPath.localScale = new Vector3(1, 1, 1);
-		}
-		else if (xAxis > 0)
-		{
-			m_isFacingRight = true;
-			transform.localScale = new Vector3(1, 1, 1);
-			BulletPath.localScale = new Vector3(-1, 1, 1);
+            // if we have a target ...
 
-		}
+            // draw a line from us to the target
 
-		// set rb velocity
-		moveTimer -= Time.deltaTime;
-		
-		if (targetInRange )
-		{
-			AttackThatHoe();
-			if (moveTimer < 0)
-			{
-				if (!IsInvoking("ResetMoveTimer"))
-					Invoke("ResetMoveTimer", ai_Smarts);
-				m_vh = m_vh * -1;
-			}
-			
-		}
-		m_rb.velocity = new Vector3(m_vh, m_vv, 0);
-	}
-	void AttackThatHoe()
-	{
-		attackTimer -= Time.deltaTime;
-		if (attackTimer < 0)
-		{
-			attackTimer = ai_Smarts;
-			GameObject _newBullet = Instantiate(BulletPrefab.gameObject, GetPath()[0], Quaternion.identity);
-			_newBullet.transform.DOPath(GetPath(), BulletSpeed, PathType.CatmullRom, PathMode.Full3D, 10, Color.yellow)
-				.SetSpeedBased(true)
-				.SetDelay(BulletDelay)
-				.SetEase(BulletEase)
-				.OnStart(() =>
-				{
-					_newBullet.SetActive(true);
-				})
-				.OnComplete(() =>
-				{
-					Destroy(_newBullet);
-				});
-		}
+            Gizmos.DrawLine(transform.position, m_targetCurrent.position);
 
-	}
-	void ResetMoveTimer()
-	{
-		moveTimer = ai_Smarts;
-
-	}
-	Vector3[] GetPath()
-	{
-		if (BulletPath != null && BulletPath.childCount > 0)
-		{
-			bulletPath = new Vector3[BulletPath.childCount];
-			for (int ai = 0; ai < BulletPath.childCount; ai++)
-			{
-				bulletPath[ai] = BulletPath.GetChild(ai).position;
-			}
-		}
-		return bulletPath;
-	}
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(transform.position, sensorRange);
-		if (targetCurrent != null)
-		{
-			Gizmos.DrawLine(transform.position, targetCurrent.position);
-			if (targetDirection.magnitude < attackRange)
+			if (DirectionToTarget().magnitude < AttackRange)
 			{
 				Gizmos.color = Color.green;
 			}
-			Gizmos.DrawWireSphere(transform.position, attackRange);
 
+            // draw a circle for the attack range
+            // red if the target is not in range, green if it is
+
+			Gizmos.DrawWireSphere(transform.position, AttackRange);
 		}
 
-	}
+        // restore the old gizmo color
 
-	// default bullet shooting behavior
+        Gizmos.color = gizomColorOld;
+    }
 
-	void UpdateGunDefault()
-	{
-		if (Input.GetAxisRaw("Fire") == 0)
-		{
-			// if you let go of the fire button you can fire again as soon as you press trigger again
+    // private state
 
-			m_timeLastFire = 0;
-		}
-		else if (Time.time - m_timeLastFire > TimeBetweenBullets)
-		{
-			// keep track of when we fired so we know when to fire again
+    private Rigidbody2D     m_rb;
+    private Transform       m_tranGun;
 
-			m_timeLastFire = Time.time;
-
-			// spawn the bullet, and set its position and velocity
-
-			bullet newBullet = Instantiate(BulletPrefab);
-			//newBullet.SetVelocity(new Vector2(m_isFacingRight ? BulletSpeed : -BulletSpeed, 0));
-			newBullet.transform.position = m_tranMuzzle.position;
-
-			m_audio.PlayOneShot(FireSound);
-		}
-	}
-
-	// check if we are on ground
-
-	bool Grounded()
-	{
-		float height = m_col.size.y;
-		float width = m_col.size.x;
-
-		// cast three rays down. one from the middle bottom, the left bottom, and the right bottom
-
-		Vector2 rayStartCenter = transform.position + new Vector3(0, -height / 2, 0);
-		Vector2 rayStartLeft = rayStartCenter + new Vector2(-width / 2, 0);
-		Vector2 rayStartRight = rayStartCenter + new Vector2(width / 2, 0);
-
-		// BB (matthew) not sure how big to make this. needs to be big enough to actually hit the ground, but small enough so it doesnt look like the hero is floating
-
-		float raycastDistance = 0.2f;
-
-		RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.down, raycastDistance);
-		RaycastHit2D leftHit = Physics2D.Raycast(rayStartLeft, Vector2.down, raycastDistance);
-		RaycastHit2D rightHit = Physics2D.Raycast(rayStartRight, Vector2.down, raycastDistance);
-
-		if (centerHit.collider == null &&
-			leftHit.collider == null &&
-			rightHit.collider == null)
-			return false;
-		else
-			return true;
-	}
-
-	// private state
-
-	private float m_vv;
-	private float m_vh;
-	private Rigidbody2D m_rb;
-	private BoxCollider2D m_col;
-	private Transform m_tranMuzzle;
-	private Transform m_tranGun;
-	private float m_timeLastFire;
-	private bool m_isFacingRight = true;
-	private AudioSource m_audio;
+    private float           m_vh;
+    private float           m_attackTimer = 1;
+    private Transform       m_targetCurrent;
 }
