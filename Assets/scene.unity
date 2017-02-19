@@ -629,8 +629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WalkSpeed: 3
-  BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
-    type: 2}
+  BulletPrefab: {fileID: 0}
   BulletSpeed: 12
   BulletDelay: 0
   BulletEase: 1
@@ -1298,18 +1297,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69623fabf052064c958ba36931964be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxJumpHeight: 4
-  WalkSpeed: 10
-  TimeBetweenBullets: 0.2
+  MaxJumpHeight: 5
+  WalkSpeed: 12
+  TimeBetweenBullets: 0.08
   BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
     type: 2}
   BulletSpeed: 50
   FireSound: {fileID: 8300000, guid: 53228edb9d556a441ad10a11e4b4329c, type: 3}
   JumpSound: {fileID: 8300000, guid: 2c54d60ad6370824aaf758a4b59fc9df, type: 3}
-  MaxWallSlideSpeed: 10
+  MaxWallSlideSpeed: 8
   WallJumpHorizontalGravity: 80
   MaxWallJumpWidth: 1
-  WallBuffer: 0
+  WallBuffer: 0.064
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0
