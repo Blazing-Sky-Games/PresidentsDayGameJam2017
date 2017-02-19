@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using DG.Tweening;
 using System.Linq;
 
 public class Mob : MonoBehaviour
@@ -13,7 +12,6 @@ public class Mob : MonoBehaviour
     public GameObject   BulletPrefab;
 	public float        BulletSpeed;
 	public float        BulletDelay;
-	public Ease         BulletEase;
 
     // ai
 
@@ -21,7 +19,8 @@ public class Mob : MonoBehaviour
     public float        TimeBetweenBullets;
     public float        SensorRange;
     public LayerMask    PlayerLayer;
-    
+	public LayerMask whatIsWall;
+
 
     void Awake()
 	{
@@ -40,7 +39,7 @@ public class Mob : MonoBehaviour
         }
         else
         {
-            return Vector2.zero;
+			return new Vector2(walkDirection, 0);
         }
     }
 
@@ -53,7 +52,15 @@ public class Mob : MonoBehaviour
                 .ToArray();
     }
 
-    void UpdateAttack()
+	RaycastHit2D WallOnLeft()
+	{
+		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * -1), whatIsWall);
+	}
+	RaycastHit2D WallOnRight()
+	{
+		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * 1), whatIsWall);
+	}
+	void UpdateAttack()
     {
         m_attackTimer -= Time.deltaTime;
 
@@ -67,26 +74,15 @@ public class Mob : MonoBehaviour
 
             // fire a bullet
 
-            Vector3[] bulletPath = GetBulletPath();
+            //Vector3[] bulletPath = GetBulletPath();
 
-            GameObject newBullet = Instantiate(BulletPrefab, bulletPath[0], Quaternion.identity);
-            newBullet.transform
-                .DOPath(
-                    bulletPath,
-                    BulletSpeed,
-                    PathType.CatmullRom,
-                    PathMode.Full3D,
-                    10,
-                    Color.yellow)
-                .SetSpeedBased(true)
-                .SetDelay(BulletDelay)
-                .SetEase(BulletEase)
-                .OnStart(() => newBullet.SetActive(true))
-                .OnComplete(() => Destroy(newBullet));
-        }
+            //GameObject newBullet = Instantiate(BulletPrefab, bulletPath[0], Quaternion.identity);
+			
+		}
     }
+	int walkDirection = 1;
 
-    void Update()
+	void Update()
 	{
         // clear target
 
@@ -95,6 +91,7 @@ public class Mob : MonoBehaviour
         // check for new current target
 
         Collider2D[] sensorHits = Physics2D.OverlapCircleAll(transform.position, SensorRange, PlayerLayer);
+
         if (sensorHits.Length > 0)
         {
             m_targetCurrent = sensorHits[0].transform;
@@ -102,12 +99,11 @@ public class Mob : MonoBehaviour
 
         // set vh. always walk towards target
 
-        int walkDirection = 0;
-        if (DirectionToTarget().x < 0)
+        if (DirectionToTarget().x < 0 || WallOnRight())
         {
             walkDirection = -1;
         }
-        else if (DirectionToTarget().x > 0)
+        else if (DirectionToTarget().x > 0 || WallOnLeft())
         {
             walkDirection = 1;
         }
@@ -157,11 +153,13 @@ public class Mob : MonoBehaviour
 
 		if (m_targetCurrent != null)
 		{
-            // if we have a target ...
+			// if we have a target ...
 
-            // draw a line from us to the target
+			// draw a line from us to the target
 
-            Gizmos.DrawLine(transform.position, m_targetCurrent.position);
+			Gizmos.DrawLine(transform.position, m_targetCurrent.position);
+			Gizmos.DrawLine(transform.position, transform.position + Vector3.right * -1);
+			Gizmos.DrawLine(transform.position, transform.position + Vector3.right * 1);
 
 			if (DirectionToTarget().magnitude < AttackRange)
 			{
