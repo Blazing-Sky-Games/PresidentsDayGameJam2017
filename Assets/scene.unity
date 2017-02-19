@@ -339,68 +339,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
   m_IsPrefabParent: 0
---- !u!1001 &418138383
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 2057658578}
-    m_Modifications:
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1868760680569400, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 58901374998809342, guid: 7925e64c1155eea48b708a89768add26,
-        type: 2}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 7925e64c1155eea48b708a89768add26, type: 2}
-  m_IsPrefabParent: 0
---- !u!114 &418138384 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
-    type: 2}
-  m_PrefabInternal: {fileID: 418138383}
-  m_Script: {fileID: 11500000, guid: c492baa41cc54db439b0c7cf58f3242e, type: 3}
---- !u!4 &418138385 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 4095483503704728, guid: 7925e64c1155eea48b708a89768add26,
-    type: 2}
-  m_PrefabInternal: {fileID: 418138383}
 --- !u!1001 &583283105
 Prefab:
   m_ObjectHideFlags: 0
@@ -947,7 +885,7 @@ Transform:
   - {fileID: 1908052233}
   - {fileID: 1292405043}
   m_Father: {fileID: 2057658578}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1428913710
 GameObject:
@@ -1134,9 +1072,9 @@ MonoBehaviour:
   FireSound: {fileID: 8300000, guid: 53228edb9d556a441ad10a11e4b4329c, type: 3}
   JumpSound: {fileID: 8300000, guid: 2c54d60ad6370824aaf758a4b59fc9df, type: 3}
   MaxWallSlideSpeed: 10
-  WallSlideGravityRatio: 0
   WallJumpHorizontalGravity: 80
   MaxWallJumpWidth: 1
+  WallBuffer: 0
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1291,7 +1229,7 @@ Transform:
   m_Children:
   - {fileID: 1984498276}
   m_Father: {fileID: 2057658578}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1565958827
 SpriteRenderer:
@@ -1417,7 +1355,8 @@ MonoBehaviour:
   MaxJumpHeight: 3
   WalkSpeed: 3
   TimeBetweenBullets: 0
-  BulletPrefab: {fileID: 418138384}
+  BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
+    type: 2}
   BulletSpeed: 12
   BulletDelay: 0
   BulletEase: 1
@@ -1511,7 +1450,6 @@ Transform:
   m_LocalPosition: {x: 7, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 418138385}
   - {fileID: 1565958826}
   - {fileID: 1407116226}
   m_Father: {fileID: 0}
