@@ -983,6 +983,10 @@ MonoBehaviour:
   BulletSpeed: 50
   FireSound: {fileID: 8300000, guid: 53228edb9d556a441ad10a11e4b4329c, type: 3}
   JumpSound: {fileID: 8300000, guid: 2c54d60ad6370824aaf758a4b59fc9df, type: 3}
+  MaxWallSlideSpeed: 10
+  WallSlideGravityRatio: 1
+  WallJumpHorizontalGravity: 80
+  MaxWallJumpWidth: 1
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0
