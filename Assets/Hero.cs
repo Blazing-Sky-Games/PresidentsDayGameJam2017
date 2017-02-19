@@ -12,6 +12,10 @@ public class Hero : MonoBehaviour
 	public float		BulletSpeed;
 	public AudioClip	FireSound;
 	public AudioClip	JumpSound;
+    public float        MaxWallSlideSpeed;
+    public float        WallSlideGravityRatio;
+    public float        WallJumpHorizontalGravity;
+    public float        MaxWallJumpWidth;
 
     // states for MonsterLove state machine
 
@@ -23,6 +27,8 @@ public class Hero : MonoBehaviour
         Walk,
         Jump,
         Fall,
+		WallSlide,
+		WallJump,
     }
 
     void Awake()
@@ -127,7 +133,7 @@ public class Hero : MonoBehaviour
 
 		// BB (matthew) not sure how big to make this. needs to be big enough to actually hit the ground, but small enough so it doesnt look like the hero is floating
 
-		float raycastDistance = 0.2f;
+		float raycastDistance = 0.1f;
 
 		RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.down, raycastDistance);
 		RaycastHit2D leftHit = Physics2D.Raycast(rayStartLeft, Vector2.down, raycastDistance);
@@ -136,6 +142,31 @@ public class Hero : MonoBehaviour
         if (centerHit.collider == null &&
             leftHit.collider == null && 
             rightHit.collider == null)
+            return false;
+        else
+            return true;
+    }
+
+    // like grounded, but for walls
+
+    bool OnWall(float direction)
+    {
+        float height = m_col.size.y;
+        float width = m_col.size.x;
+
+        Vector2 rayStartCenter = transform.position + new Vector3(direction * width / 2, 0, 0);
+        Vector2 rayStartBottom = rayStartCenter + new Vector2(0, -height / 2);
+        Vector2 rayStartTop = rayStartCenter + new Vector2(0, height / 2);
+
+        float raycastDistance = 0.1f;
+
+        RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.right * direction, raycastDistance);
+        RaycastHit2D bottomHit = Physics2D.Raycast(rayStartBottom, Vector2.right * direction, raycastDistance);
+        RaycastHit2D topHit = Physics2D.Raycast(rayStartTop, Vector2.right * direction, raycastDistance);
+
+        if (bottomHit.collider == null && 
+            centerHit.collider == null && 
+            topHit.collider == null)
             return false;
         else
             return true;
@@ -215,7 +246,7 @@ public class Hero : MonoBehaviour
     {
 		m_audio.PlayOneShot (JumpSound);
 
-		// calculate launch velocity based on desired jump height
+        // calculate launch velocity based on desired jump height
 
         m_vv = Mathf.Sqrt(-2 * Physics2D.gravity.y * MaxJumpHeight);
     }
@@ -259,6 +290,10 @@ public class Hero : MonoBehaviour
 
             m_fsm.ChangeState(HeroState.Fall);
         }
+		else if ((Input.GetAxisRaw ("Horizontal") < 0 && OnWall (-1)) || (Input.GetAxisRaw ("Horizontal") > 0 && OnWall (1)))
+		{
+			m_fsm.ChangeState (HeroState.WallSlide);
+		}
     }
 
 
@@ -292,7 +327,163 @@ public class Hero : MonoBehaviour
 
             m_fsm.ChangeState(HeroState.Idle);
         }
+		else if ((Input.GetAxisRaw ("Horizontal") < 0 && OnWall (-1)) || (Input.GetAxisRaw ("Horizontal") > 0 && OnWall (1)))
+		{
+			m_fsm.ChangeState (HeroState.WallSlide);
+		}
     }
+
+	// wallslide state
+
+	void WallSlide_Enter()
+	{
+        // when we first "stick" to the wall
+        // if we are falling, set our vertical veocity to zero
+
+        if(m_vv < 0)
+            m_vv = 0;
+    }
+
+	void WallSlide_Update()
+	{
+        // accelration due to gravity, but we cap the fall speed
+
+        if (m_vv > 0 || Mathf.Abs (m_vv) < MaxWallSlideSpeed)
+		{
+            m_vv += Physics2D.gravity.y * WallSlideGravityRatio * Time.deltaTime;
+		}
+
+        // we are on the wall, we aint going left or right
+
+        m_vh = 0;
+
+        m_rb.velocity = new Vector2(m_vh, m_vv);
+
+        // make sure we are faceing the right way (away from the wall)
+
+        if (OnWall(1))
+        {
+            m_isFacingRight = false;
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else if (OnWall(-1))
+        {
+            m_isFacingRight = true;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        // gun
+
+        UpdateGunDefault();
+
+        if (Grounded())
+        {
+            // if we slid all the way to the ground go to idle
+            // BB (matthew) hmm... could this go off because we are right next to the wall?
+
+            m_fsm.ChangeState(HeroState.Idle);
+        }
+        else if ((OnWall( 1) && Input.GetAxisRaw("Horizontal") <= 0) || 
+                 (OnWall(-1) && Input.GetAxisRaw("Horizontal") >= 0))
+        {
+            if(Input.GetButtonDown("Jump"))
+            {
+                m_fsm.ChangeState(HeroState.Jump);
+            }
+            else
+            {
+                m_fsm.ChangeState(HeroState.Fall);
+            }
+        }
+        else if (OnWall(1) && Input.GetAxisRaw("Horizontal") > 0 && Input.GetButtonDown("Jump"))
+        {
+            m_wallJumpWallDirection = 1;
+            m_fsm.ChangeState(HeroState.WallJump);
+        }
+        else if (OnWall(-1) && Input.GetAxisRaw("Horizontal") < 0 && Input.GetButtonDown("Jump"))
+        {
+            m_wallJumpWallDirection = -1;
+            m_fsm.ChangeState(HeroState.WallJump);
+        }
+	}
+
+	// walljump State
+
+	void WallJump_Enter()
+	{
+        m_audio.PlayOneShot(JumpSound);
+
+        m_vh = Mathf.Sqrt(2 * WallJumpHorizontalGravity * MaxWallJumpWidth);
+
+        float wallJumpMaxTime = 2 * m_vh / WallJumpHorizontalGravity;
+
+        // derive vertical launch velocity
+        // v(T) = m_vv + g * T
+        // integrate with respect to T
+        // s(T) = m_vv * T + g / 2 * T * T
+        // MaxWallJumpHeight = m_vv * T + g / 2 * T * T, solve for m_vv gives
+        // m_vv = MaxWallJumpHeight / T - g / 2 * T
+
+        m_vv = MaxJumpHeight / wallJumpMaxTime - Physics2D.gravity.y * wallJumpMaxTime / 2;
+
+        // make sure vh is in right direction (away from wall)
+
+        m_vh *= m_wallJumpWallDirection * -1;
+    }
+
+	void WallJump_Update()
+	{
+        m_rb.velocity = new Vector2(m_vh, m_vv);
+
+        m_vh += WallJumpHorizontalGravity * m_wallJumpWallDirection * Time.deltaTime;
+        m_vv += Physics2D.gravity.y * Time.deltaTime;
+
+        // make sure we are facing the right direction (towards the wall)
+
+        if (m_wallJumpWallDirection == 1)
+        {
+            m_isFacingRight = true;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (m_wallJumpWallDirection == -1)
+        {
+            m_isFacingRight = false;
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+
+        // update gun
+
+        UpdateGunDefault();
+
+        if ((Input.GetAxisRaw ("Horizontal") <= 0 && m_wallJumpWallDirection == 1) || 
+            (Input.GetAxisRaw ("Horizontal") >= 0 && m_wallJumpWallDirection == -1))
+		{
+            // if the stick is defelcted away from wall -> fall
+
+            m_fsm.ChangeState (HeroState.Fall);
+		}
+		
+		else if (Mathf.Sign(m_vh) != m_wallJumpWallDirection && !Input.GetButton("Jump"))
+		{
+            //let go of jump Button while moving away from wall -> lose velocity away from wall
+
+            m_vh = 0;
+		}
+		else if (OnWall(m_wallJumpWallDirection) && Mathf.Sign(m_vh) == m_wallJumpWallDirection)
+		{
+            //hit wall -> wall slide
+
+            m_fsm.ChangeState (HeroState.WallSlide);
+		} 
+		
+		else if(Mathf.Abs(m_vh) > Mathf.Sqrt(2 * WallJumpHorizontalGravity * MaxWallJumpWidth) * 1.3)
+		{
+            //miss wall -> fall
+            // this can happen if we wall jump over the top of a wall
+
+            m_fsm.ChangeState (HeroState.Fall);
+		}
+	}
 
     // private state
 
@@ -305,4 +496,5 @@ public class Hero : MonoBehaviour
 	private float						m_timeLastFire;
 	private bool						m_isFacingRight = true;
 	private AudioSource					m_audio;
+    private int                         m_wallJumpWallDirection;
 }
