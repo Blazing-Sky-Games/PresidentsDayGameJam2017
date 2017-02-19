@@ -355,8 +355,6 @@ public class Hero : MonoBehaviour
 
         if(m_vv < -MaxWallSlideSpeed)
             m_vv = -MaxWallSlideSpeed;
-		
-		m_spriteRenderer.color = Color.red;
     }
 
 	void WallSlide_Update()
@@ -427,11 +425,6 @@ public class Hero : MonoBehaviour
             m_wallJumpWallDirection = -1;
             m_fsm.ChangeState(HeroState.WallJump);
         }
-	}
-
-	void WallSlide_Exit()
-	{
-		m_spriteRenderer.color = Color.green;
 	}
 
 	// walljump State
