@@ -13,9 +13,9 @@ public class Hero : MonoBehaviour
 	public AudioClip	FireSound;
 	public AudioClip	JumpSound;
     public float        MaxWallSlideSpeed;
-    public float        WallSlideGravityRatio;
     public float        WallJumpHorizontalGravity;
     public float        MaxWallJumpWidth;
+	public float		WallBuffer;
 
     // states for MonsterLove state machine
 
@@ -44,6 +44,9 @@ public class Hero : MonoBehaviour
 		m_audio = GetComponent<AudioSource>();
 
 		m_tranMuzzle = transform.FindChild ("gun").FindChild ("muzzle");
+
+		m_spriteRenderer = GetComponent<SpriteRenderer>();
+
     }
 
     void Start()
@@ -190,7 +193,7 @@ public class Hero : MonoBehaviour
         {
             // if we press the jump button, jump
 
-            m_fsm.ChangeState(HeroState.Jump);
+			Jump ();
         }
         else if (Input.GetAxisRaw("Horizontal") != 0)
         {
@@ -224,7 +227,7 @@ public class Hero : MonoBehaviour
         {
             // if we press jump, jump
 
-            m_fsm.ChangeState(HeroState.Jump);
+			Jump ();
         }
         else if (Input.GetAxisRaw("Horizontal") == 0)
         {
@@ -241,15 +244,17 @@ public class Hero : MonoBehaviour
     }
 
     // jump state
-
-    void Jump_Enter()
-    {
+	void Jump()
+	{
 		m_audio.PlayOneShot (JumpSound);
 
-        // calculate launch velocity based on desired jump height
+		// calculate launch velocity based on desired jump height
 
-        m_vv = Mathf.Sqrt(-2 * Physics2D.gravity.y * MaxJumpHeight);
-    }
+		m_vv = Mathf.Sqrt(-2 * Physics2D.gravity.y * MaxJumpHeight);
+
+		m_fsm.ChangeState (HeroState.Jump);
+	}
+		
 
     void Jump_Update()
     {
@@ -305,8 +310,8 @@ public class Hero : MonoBehaviour
 
         // BB (matthew) should this only be in one place?
 
-        if (m_vv > 0)
-            m_vv = 0;
+        //if (m_vv > 0)
+        //    m_vv = 0;
     }
 
     void Fall_Update()
@@ -340,8 +345,10 @@ public class Hero : MonoBehaviour
         // when we first "stick" to the wall
         // if we are falling, set our vertical veocity to zero
 
-        if(m_vv < 0)
-            m_vv = 0;
+        if(m_vv < -MaxWallSlideSpeed)
+            m_vv = -MaxWallSlideSpeed;
+		
+		m_spriteRenderer.color = Color.red;
     }
 
 	void WallSlide_Update()
@@ -350,7 +357,7 @@ public class Hero : MonoBehaviour
 
         if (m_vv > 0 || Mathf.Abs (m_vv) < MaxWallSlideSpeed)
 		{
-            m_vv += Physics2D.gravity.y * WallSlideGravityRatio * Time.deltaTime;
+            m_vv += Physics2D.gravity.y * Time.deltaTime;
 		}
 
         // we are on the wall, we aint going left or right
@@ -386,13 +393,20 @@ public class Hero : MonoBehaviour
         else if ((OnWall( 1) && Input.GetAxisRaw("Horizontal") <= 0) || 
                  (OnWall(-1) && Input.GetAxisRaw("Horizontal") >= 0))
         {
-            if(Input.GetButtonDown("Jump"))
+			if (m_timeWallStickBegin == -1) 
+			{
+				m_timeWallStickBegin = Time.time;
+			}
+
+			if (Input.GetButtonDown("Jump"))
             {
-                m_fsm.ChangeState(HeroState.Jump);
+				Jump ();
+				m_timeWallStickBegin = -1;
             }
-            else
+			else if (Time.time - m_timeWallStickBegin > WallBuffer)
             {
                 m_fsm.ChangeState(HeroState.Fall);
+				m_timeWallStickBegin = -1;
             }
         }
         else if (OnWall(1) && Input.GetAxisRaw("Horizontal") > 0 && Input.GetButtonDown("Jump"))
@@ -405,6 +419,11 @@ public class Hero : MonoBehaviour
             m_wallJumpWallDirection = -1;
             m_fsm.ChangeState(HeroState.WallJump);
         }
+	}
+
+	void WallSlide_Exit()
+	{
+		m_spriteRenderer.color = Color.green;
 	}
 
 	// walljump State
@@ -460,7 +479,7 @@ public class Hero : MonoBehaviour
 		{
             // if the stick is defelcted away from wall -> fall
 
-            m_fsm.ChangeState (HeroState.Fall);
+			m_fsm.ChangeState (HeroState.Jump);
 		}
 		
 		else if (Mathf.Sign(m_vh) != m_wallJumpWallDirection && !Input.GetButton("Jump"))
@@ -497,4 +516,6 @@ public class Hero : MonoBehaviour
 	private bool						m_isFacingRight = true;
 	private AudioSource					m_audio;
     private int                         m_wallJumpWallDirection;
+	private SpriteRenderer				m_spriteRenderer;
+	private float						m_timeWallStickBegin = -1;
 }
