@@ -419,6 +419,10 @@ public class Hero : MonoBehaviour
             m_wallJumpWallDirection = -1;
             m_fsm.ChangeState(HeroState.WallJump);
         }
+		else if (!OnWall(-1) && !OnWall(1))
+		{
+			m_fsm.ChangeState(HeroState.Fall);
+		}
 	}
 
 	void WallSlide_Exit()

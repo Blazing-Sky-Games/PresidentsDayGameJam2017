@@ -266,7 +266,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 78.5
+      value: 8.5
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.z
@@ -460,8 +460,8 @@ Transform:
   m_PrefabInternal: {fileID: 1246927852}
   m_GameObject: {fileID: 1143609911}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.46, y: 34.4, z: 0}
-  m_LocalScale: {x: 13.070514, y: 86.86836, z: 1}
+  m_LocalPosition: {x: -16, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 18, z: 1}
   m_Children: []
   m_Father: {fileID: 1428913711}
   m_RootOrder: 0
@@ -543,12 +543,12 @@ Transform:
   m_PrefabInternal: {fileID: 413172213}
   m_GameObject: {fileID: 1244769339}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 78.5, z: 0}
+  m_LocalPosition: {x: 0, y: 8.5, z: 0}
   m_LocalScale: {x: 32, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1428913711}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.93200004}
 --- !u!61 &1244769341
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -609,11 +609,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -9.46
+      value: -16
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 34.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.z
@@ -645,11 +645,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalScale.y
-      value: 86.86836
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalScale.x
-      value: 13.070514
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1539012118784982, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_StaticEditorFlags
@@ -684,8 +684,8 @@ Transform:
   m_PrefabInternal: {fileID: 1252697597}
   m_GameObject: {fileID: 1249822552}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.01, y: 34.8, z: 0}
-  m_LocalScale: {x: 11.973193, y: 87.57591, z: 1}
+  m_LocalPosition: {x: 16, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 18, z: 1}
   m_Children: []
   m_Father: {fileID: 1428913711}
   m_RootOrder: 1
@@ -750,11 +750,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 10.01
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 34.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalPosition.z
@@ -786,11 +786,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalScale.y
-      value: 87.57591
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 4052865585215096, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_LocalScale.x
-      value: 11.973193
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1539012118784982, guid: 28c6520a1d90f6843830ca13a5e8cabe, type: 2}
       propertyPath: m_StaticEditorFlags
@@ -975,15 +975,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69623fabf052064c958ba36931964be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxJumpHeight: 4
-  WalkSpeed: 10
-  TimeBetweenBullets: 0.2
+  MaxJumpHeight: 5
+  WalkSpeed: 12
+  TimeBetweenBullets: 0.08
   BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
     type: 2}
   BulletSpeed: 50
   FireSound: {fileID: 8300000, guid: 53228edb9d556a441ad10a11e4b4329c, type: 3}
   JumpSound: {fileID: 8300000, guid: 2c54d60ad6370824aaf758a4b59fc9df, type: 3}
-  MaxWallSlideSpeed: 10
+  MaxWallSlideSpeed: 8
   WallJumpHorizontalGravity: 80
   MaxWallJumpWidth: 1
   WallBuffer: 0.064
