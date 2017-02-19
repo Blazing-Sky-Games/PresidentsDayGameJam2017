@@ -138,9 +138,13 @@ public class Hero : MonoBehaviour
 
 		float raycastDistance = 0.1f;
 
-		RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.down, raycastDistance);
-		RaycastHit2D leftHit = Physics2D.Raycast(rayStartLeft, Vector2.down, raycastDistance);
-		RaycastHit2D rightHit = Physics2D.Raycast(rayStartRight, Vector2.down, raycastDistance);
+        // ignore the player when raycasting
+
+        LayerMask mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+        RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.down, raycastDistance, mask);
+		RaycastHit2D leftHit = Physics2D.Raycast(rayStartLeft, Vector2.down, raycastDistance, mask);
+		RaycastHit2D rightHit = Physics2D.Raycast(rayStartRight, Vector2.down, raycastDistance, mask);
 
         if (centerHit.collider == null &&
             leftHit.collider == null && 
@@ -163,9 +167,13 @@ public class Hero : MonoBehaviour
 
         float raycastDistance = 0.1f;
 
-        RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.right * direction, raycastDistance);
-        RaycastHit2D bottomHit = Physics2D.Raycast(rayStartBottom, Vector2.right * direction, raycastDistance);
-        RaycastHit2D topHit = Physics2D.Raycast(rayStartTop, Vector2.right * direction, raycastDistance);
+        // ignore the player when raycasting
+
+        LayerMask mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+        RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.right * direction, raycastDistance, mask);
+        RaycastHit2D bottomHit = Physics2D.Raycast(rayStartBottom, Vector2.right * direction, raycastDistance, mask);
+        RaycastHit2D topHit = Physics2D.Raycast(rayStartTop, Vector2.right * direction, raycastDistance, mask);
 
         if (bottomHit.collider == null && 
             centerHit.collider == null && 
@@ -347,8 +355,6 @@ public class Hero : MonoBehaviour
 
         if(m_vv < -MaxWallSlideSpeed)
             m_vv = -MaxWallSlideSpeed;
-		
-		m_spriteRenderer.color = Color.red;
     }
 
 	void WallSlide_Update()
@@ -423,11 +429,6 @@ public class Hero : MonoBehaviour
 		{
 			m_fsm.ChangeState(HeroState.Fall);
 		}
-	}
-
-	void WallSlide_Exit()
-	{
-		m_spriteRenderer.color = Color.green;
 	}
 
 	// walljump State
