@@ -316,7 +316,7 @@ public class Hero : MonoBehaviour
 
 	void Jump()
 	{
-		m_audio.PlayOneShot (JumpSound, 0.5f);
+		m_audio.PlayOneShot (JumpSound, 0.8f);
 
 		// calculate launch velocity based on desired jump height
 
