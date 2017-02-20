@@ -44,10 +44,7 @@ public class Hero : MonoBehaviour
 
 		m_audio = GetComponent<AudioSource>();
 
-		m_tranMuzzle = transform.FindChild ("gun").FindChild ("muzzle");
-
-		m_spriteRenderer = GetComponent<SpriteRenderer>();
-
+		m_tranMuzzle = transform.FindChild ("muzzle");
     }
 
     void Start()
@@ -131,6 +128,14 @@ public class Hero : MonoBehaviour
 
     bool Grounded()
     {
+        float dist;
+        return Grounded(out dist);
+    } 
+
+    bool Grounded(out float distance)
+    {
+        distance = -1;
+
         float height = m_col.size.y;
         float width = m_col.size.x;
 
@@ -142,7 +147,7 @@ public class Hero : MonoBehaviour
 
 		// BB (matthew) not sure how big to make this. needs to be big enough to actually hit the ground, but small enough so it doesnt look like the hero is floating
 
-		float raycastDistance = 0.1f;
+		float raycastDistance = 0.05f;
 
         // ignore the player when raycasting
 
@@ -153,17 +158,40 @@ public class Hero : MonoBehaviour
 		RaycastHit2D rightHit = Physics2D.Raycast(rayStartRight, Vector2.down, raycastDistance, mask);
 
         if (centerHit.collider == null &&
-            leftHit.collider == null && 
+            leftHit.collider == null &&
             rightHit.collider == null)
             return false;
         else
+        {
+            if (centerHit.collider != null)
+            {
+                distance = centerHit.distance;
+            }
+            else if (leftHit.collider != null)
+            {
+                distance = leftHit.distance;
+            }
+            else
+            {
+                distance = rightHit.distance;
+            }
+
             return true;
+        }
     }
 
     // like grounded, but for walls
 
     bool OnWall(float direction)
     {
+        float dist;
+        return OnWall(direction, out dist);
+    }
+
+    bool OnWall(float direction, out float distance)
+    {
+        distance = -1;
+
         float height = m_col.size.y;
         float width = m_col.size.x;
 
@@ -171,7 +199,7 @@ public class Hero : MonoBehaviour
         Vector2 rayStartBottom = rayStartCenter + new Vector2(0, -height / 2);
         Vector2 rayStartTop = rayStartCenter + new Vector2(0, height / 2);
 
-        float raycastDistance = 0.1f;
+        float raycastDistance = 0.05f;
 
         // ignore the player when raycasting
 
@@ -181,12 +209,27 @@ public class Hero : MonoBehaviour
         RaycastHit2D bottomHit = Physics2D.Raycast(rayStartBottom, Vector2.right * direction, raycastDistance, mask);
         RaycastHit2D topHit = Physics2D.Raycast(rayStartTop, Vector2.right * direction, raycastDistance, mask);
 
-        if (bottomHit.collider == null && 
-            centerHit.collider == null && 
+        if (bottomHit.collider == null &&
+            centerHit.collider == null &&
             topHit.collider == null)
             return false;
         else
+        {
+            if(bottomHit.collider != null)
+            {
+                distance = bottomHit.distance;
+            }
+            else if(centerHit.collider != null)
+            {
+                distance = centerHit.distance;
+            }
+            else
+            {
+                distance = topHit.distance;
+            }
+
             return true;
+        }
     }
 
     // idle state
@@ -196,6 +239,14 @@ public class Hero : MonoBehaviour
         // if we are idle, we are not moving in the y axis
 
         m_vv = 0;
+
+        // make sure we are flush with the ground
+
+        float distToGround;
+        if(Grounded(out distToGround))
+        {
+            transform.position -= new Vector3(0, distToGround, 0);
+        }
     }
 
     void Idle_Update()
@@ -258,6 +309,7 @@ public class Hero : MonoBehaviour
     }
 
     // jump state
+
 	void Jump()
 	{
 		m_audio.PlayOneShot (JumpSound);
@@ -318,16 +370,6 @@ public class Hero : MonoBehaviour
 
     // fall state
 
-    void Fall_Enter()
-    {
-        // replication of the behavior in Jump_Update that transisions to fall
-
-        // BB (matthew) should this only be in one place?
-
-        //if (m_vv > 0)
-        //    m_vv = 0;
-    }
-
     void Fall_Update()
     {
         // acceleration due to gravity
@@ -335,7 +377,7 @@ public class Hero : MonoBehaviour
         m_vv += Physics2D.gravity.y * Time.deltaTime;
 
         UpdateVDefault();
-		UpdateGunDefault ();
+		UpdateGunDefault();
 
         if (Grounded())
         {
@@ -357,12 +399,22 @@ public class Hero : MonoBehaviour
 	void WallSlide_Enter()
 	{
         // when we first "stick" to the wall
-        // if we are falling, set our vertical veocity to zero
+        // if we are falling, cap our fall speed to the max slide speed
 
         if(m_vv < -MaxWallSlideSpeed)
             m_vv = -MaxWallSlideSpeed;
 
-		m_spriteRenderer.color = Color.red;
+        // make sure we are flush with the wall
+
+        float distToWall;
+        if (OnWall(1, out distToWall))
+        {
+            transform.position += new Vector3(distToWall, 0, 0);
+        }
+        else if (OnWall(-1, out distToWall))
+        {
+            transform.position += new Vector3(-distToWall, 0, 0);
+        }
     }
 
 	void WallSlide_Update()
@@ -397,10 +449,9 @@ public class Hero : MonoBehaviour
 
         UpdateGunDefault();
 
-        if (Grounded())
+        if (Grounded() && m_vv <= 0)
         {
             // if we slid all the way to the ground go to idle
-            // BB (matthew) hmm... could this go off because we are right next to the wall?
 
             m_fsm.ChangeState(HeroState.Idle);
         }
@@ -437,11 +488,6 @@ public class Hero : MonoBehaviour
 		{
 			m_fsm.ChangeState(HeroState.Fall);
 		}
-	}
-
-	void WallSlide_Exit()
-	{
-		m_spriteRenderer.color = Color.green;
 	}
 
 	// walljump State
@@ -510,6 +556,10 @@ public class Hero : MonoBehaviour
 		{
             //hit wall -> wall slide
 
+            // dont slide up the wall after a wall jump
+
+            m_vv = 0;
+
             m_fsm.ChangeState (HeroState.WallSlide);
 		} 
 		
@@ -534,6 +584,5 @@ public class Hero : MonoBehaviour
 	private bool						m_isFacingRight = true;
 	private AudioSource					m_audio;
     private int                         m_wallJumpWallDirection;
-	private SpriteRenderer				m_spriteRenderer;
 	private float						m_timeWallStickBegin = -1;
 }
