@@ -8,6 +8,7 @@ public class Mob : MonoBehaviour
     public float        SensorRange;
     public LayerMask    PlayerLayer;
 	public LayerMask    WallLayer;
+    public int          HP;
 
     void Awake()
 	{
@@ -39,6 +40,11 @@ public class Mob : MonoBehaviour
 	
 	void Update()
 	{
+        if(HP <= 0)
+        {
+            Destroy(gameObject);
+        }
+        
         // clear target
 
         m_targetCurrent = null;

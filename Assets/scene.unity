@@ -513,14 +513,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba4cce8cc67b3143bf7e2050029588f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WalkSpeed: 24
-  SensorRange: 10
+  WalkSpeed: 30
+  SensorRange: 20
   PlayerLayer:
     serializedVersion: 2
     m_Bits: 256
   WallLayer:
     serializedVersion: 2
     m_Bits: 1
+  HP: 5
 --- !u!61 &1106720038
 BoxCollider2D:
   m_ObjectHideFlags: 0
