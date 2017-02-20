@@ -16,6 +16,7 @@ public class Hero : MonoBehaviour
     public float        WallJumpHorizontalGravity;
     public float        MaxWallJumpWidth;
 	public float		WallBuffer;
+	public float		ScreenShakeTime;
 
     // states for MonsterLove state machine
 
@@ -121,6 +122,8 @@ public class Hero : MonoBehaviour
 			newBullet.transform.position = m_tranMuzzle.position;
 
 			m_audio.PlayOneShot (FireSound);
+
+			Camera.main.GetComponent<CameraFollow>().ScreenShakeUntil(Time.time + ScreenShakeTime);
 		}
 	}
 
