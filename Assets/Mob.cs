@@ -9,6 +9,7 @@ public class Mob : MonoBehaviour
     public LayerMask    PlayerLayer;
 	public LayerMask    WallLayer;
     public int          HP;
+    public AudioClip    DeathSound;
 
     void Awake()
 	{
@@ -42,6 +43,8 @@ public class Mob : MonoBehaviour
 	{
         if(HP <= 0)
         {
+            GameObject.Find("hero").GetComponent<AudioSource>().PlayOneShot(DeathSound, 0.6f);
+
             Destroy(gameObject);
         }
         
@@ -129,7 +132,6 @@ public class Mob : MonoBehaviour
     // private state
 
     private Rigidbody2D     m_rb;
-    private Transform       m_tranGun;
     private float           m_vh;
     private Transform       m_targetCurrent;
     int                     m_walkDirection = 1;

@@ -122,7 +122,7 @@ public class Hero : MonoBehaviour
 			newBullet.SetVelocity (new Vector2 (m_isFacingRight ? BulletSpeed : -BulletSpeed, 0));
 			newBullet.transform.position = m_tranMuzzle.position;
 
-			m_audio.PlayOneShot (FireSound);
+			m_audio.PlayOneShot (FireSound, 0.4f);
 
 			Camera.main.GetComponent<CameraFollow>().ScreenShakeUntil(Time.time + ScreenShakeTime);
 		}
@@ -316,7 +316,7 @@ public class Hero : MonoBehaviour
 
 	void Jump()
 	{
-		m_audio.PlayOneShot (JumpSound);
+		m_audio.PlayOneShot (JumpSound, 0.5f);
 
 		// calculate launch velocity based on desired jump height
 
