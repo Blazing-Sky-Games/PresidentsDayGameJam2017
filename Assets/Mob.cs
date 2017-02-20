@@ -30,11 +30,11 @@ public class Mob : MonoBehaviour
 
 	RaycastHit2D WallOnLeft()
 	{
-		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * -2), WallLayer);
+		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * -8), WallLayer);
 	}
 	RaycastHit2D WallOnRight()
 	{
-		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * 2), WallLayer);
+		return Physics2D.Linecast(transform.position, (Vector2)transform.position + (Vector2.right * 8), WallLayer);
 	}
 	
 	void Update()
