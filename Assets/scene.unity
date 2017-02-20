@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 62727937}
   - component: {fileID: 62727936}
   - component: {fileID: 62727935}
+  - component: {fileID: 62727934}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -109,6 +110,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &62727934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 62727933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37e817fd7e4d774479536ec3192e353b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hero: {fileID: 1449202814}
+  MaxLag: 2
+  CameraSpeedMin: 10
+  CameraSpeedMax: 12
+  MaxCameraShake: 0.15
+  ScreenShakeIntensity: 15
 --- !u!124 &62727935
 Behaviour:
   m_ObjectHideFlags: 0
@@ -163,7 +181,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 62727933}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -534,7 +552,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WalkSpeed: 3
-  BulletPrefab: {fileID: 0}
+  BulletPrefab: {fileID: 1868760680569400, guid: 9fc290fcd76f5cc4899b8dfb9b610675,
+    type: 2}
   BulletSpeed: 12
   BulletDelay: 0
   AttackRange: 0
@@ -1110,7 +1129,7 @@ Rigidbody2D:
   m_AngularDrag: 0
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 4aa6439e2927fff48a33c111ae176a08, type: 2}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -1182,10 +1201,11 @@ MonoBehaviour:
   BulletSpeed: 50
   FireSound: {fileID: 8300000, guid: 53228edb9d556a441ad10a11e4b4329c, type: 3}
   JumpSound: {fileID: 8300000, guid: 2c54d60ad6370824aaf758a4b59fc9df, type: 3}
-  MaxWallSlideSpeed: 0
-  WallJumpHorizontalGravity: 0
-  MaxWallJumpWidth: 0
-  WallBuffer: 0
+  MaxWallSlideSpeed: 8
+  WallJumpHorizontalGravity: 80
+  MaxWallJumpWidth: 1
+  WallBuffer: 0.064
+  ScreenShakeTime: 0.1
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0

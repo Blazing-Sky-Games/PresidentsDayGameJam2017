@@ -16,6 +16,7 @@ public class Hero : MonoBehaviour
     public float        WallJumpHorizontalGravity;
     public float        MaxWallJumpWidth;
 	public float		WallBuffer;
+	public float		ScreenShakeTime;
 
     // states for MonsterLove state machine
 
@@ -56,6 +57,13 @@ public class Hero : MonoBehaviour
         m_fsm.ChangeState(HeroState.Idle);
     }
 
+	void FixedUpdate()
+	{
+		// set rb velocity
+
+		m_rb.velocity = new Vector3(m_vh, m_vv, 0);
+	}
+
     // default root motion when nothing special is happening
 
     void UpdateVDefault()
@@ -89,10 +97,6 @@ public class Hero : MonoBehaviour
 			m_isFacingRight = true;
 			transform.localScale = new Vector3(1, 1, 1);
         }
-
-        // set rb velocity
-
-        m_rb.velocity = new Vector3(m_vh, m_vv, 0);
     }
 
 	// default bullet shooting behavior
@@ -118,6 +122,8 @@ public class Hero : MonoBehaviour
 			newBullet.transform.position = m_tranMuzzle.position;
 
 			m_audio.PlayOneShot (FireSound);
+
+			Camera.main.GetComponent<CameraFollow>().ScreenShakeUntil(Time.time + ScreenShakeTime);
 		}
 	}
 
@@ -140,7 +146,7 @@ public class Hero : MonoBehaviour
 
         // ignore the player when raycasting
 
-        LayerMask mask = ~(1 << LayerMask.NameToLayer("Player"));
+		LayerMask mask = ~((1 << LayerMask.NameToLayer("Player")) | (1 << LayerMask.NameToLayer("Ignore Raycast")));
 
         RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.down, raycastDistance, mask);
 		RaycastHit2D leftHit = Physics2D.Raycast(rayStartLeft, Vector2.down, raycastDistance, mask);
@@ -169,7 +175,7 @@ public class Hero : MonoBehaviour
 
         // ignore the player when raycasting
 
-        LayerMask mask = ~(1 << LayerMask.NameToLayer("Player"));
+		LayerMask mask = ~((1 << LayerMask.NameToLayer("Player")) | (1 << LayerMask.NameToLayer("Ignore Raycast")));
 
         RaycastHit2D centerHit = Physics2D.Raycast(rayStartCenter, Vector2.right * direction, raycastDistance, mask);
         RaycastHit2D bottomHit = Physics2D.Raycast(rayStartBottom, Vector2.right * direction, raycastDistance, mask);
@@ -355,6 +361,8 @@ public class Hero : MonoBehaviour
 
         if(m_vv < -MaxWallSlideSpeed)
             m_vv = -MaxWallSlideSpeed;
+
+		m_spriteRenderer.color = Color.red;
     }
 
 	void WallSlide_Update()
@@ -429,6 +437,11 @@ public class Hero : MonoBehaviour
 		{
 			m_fsm.ChangeState(HeroState.Fall);
 		}
+	}
+
+	void WallSlide_Exit()
+	{
+		m_spriteRenderer.color = Color.green;
 	}
 
 	// walljump State
