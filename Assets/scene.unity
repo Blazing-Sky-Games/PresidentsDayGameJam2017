@@ -118,7 +118,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 62727933}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37e817fd7e4d774479536ec3192e353b, type: 3}
+  m_Script: {fileID: 11500000, guid: a7086edd11df5994bb2ca7c6145ca22c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Hero: {fileID: 1449202814}
@@ -188,73 +188,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &175213998
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 1703226912836062, guid: 9588669a6cdf4174cbd31297ef69d312,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 175213999}
-  - component: {fileID: 175214000}
-  m_Layer: 0
-  m_Name: gun
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &175213999
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 4031988104591148, guid: 9588669a6cdf4174cbd31297ef69d312,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 175213998}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.391, y: -0.175, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.2, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1106720041}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &175214000
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 212453353753263444, guid: 9588669a6cdf4174cbd31297ef69d312,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 175213998}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 0
-  m_ReflectionProbeUsage: 0
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3b91aba07207db64abfb624c789bea02, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
 --- !u!1 &342020970
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,17 +485,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WalkSpeed: 3
-  BulletPrefab: {fileID: 1868760680569400, guid: 9fc290fcd76f5cc4899b8dfb9b610675,
-    type: 2}
-  BulletSpeed: 12
-  BulletDelay: 0
-  AttackRange: 0
-  TimeBetweenBullets: 0.5
   SensorRange: 2.62
   PlayerLayer:
     serializedVersion: 2
     m_Bits: 256
-  whatIsWall:
+  WallLayer:
     serializedVersion: 2
     m_Bits: 1
 --- !u!61 &1106720038
@@ -597,7 +524,7 @@ Rigidbody2D:
   m_AngularDrag: 0
   m_GravityScale: 10
   m_Material: {fileID: 6200000, guid: 4aa6439e2927fff48a33c111ae176a08, type: 2}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -647,8 +574,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 175213999}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
