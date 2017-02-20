@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using MonsterLove.StateMachine;
+using System.Collections;
 
 public class Hero : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class Hero : MonoBehaviour
     public float        MaxWallJumpWidth;
 	public float		WallBuffer;
 	public float		ScreenShakeTime;
+    public float        HitStun;
+    public AudioClip    HurtSound;
 
     // states for MonsterLove state machine
 
@@ -30,6 +33,7 @@ public class Hero : MonoBehaviour
         Fall,
 		WallSlide,
 		WallJump,
+        Hurt,
     }
 
     void Awake()
@@ -571,6 +575,34 @@ public class Hero : MonoBehaviour
             m_fsm.ChangeState (HeroState.Fall);
 		}
 	}
+
+    // hurt state
+
+    public void Hurt()
+    {
+        m_fsm.ChangeState(HeroState.Hurt);
+    }
+
+    IEnumerator Hurt_Enter()
+    {
+        m_audio.PlayOneShot(HurtSound);
+
+        m_vh = 0;
+        m_vv = 0;
+        m_col.enabled = false;
+
+        float elapsed = 0;
+
+        while (elapsed < HitStun)
+        {
+            elapsed += Time.deltaTime;
+            yield return 0;
+        }
+
+        m_col.enabled = true;
+
+        m_fsm.ChangeState(HeroState.Idle);
+    }
 
     // private state
 

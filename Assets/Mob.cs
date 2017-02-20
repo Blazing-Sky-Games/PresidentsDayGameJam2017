@@ -116,6 +116,16 @@ public class Mob : MonoBehaviour
         Gizmos.color = gizomColorOld;
     }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        Hero hero = collision.gameObject.GetComponent<Hero>();
+        if(hero != null)
+        {
+            hero.Hurt();
+            m_targetCurrent = null;
+        }
+    }
+
     // private state
 
     private Rigidbody2D     m_rb;

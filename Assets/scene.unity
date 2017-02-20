@@ -1193,6 +1193,8 @@ MonoBehaviour:
   MaxWallJumpWidth: 4
   WallBuffer: 0.1
   ScreenShakeTime: 0.1
+  HitStun: 1
+  HurtSound: {fileID: 8300000, guid: 62ed99178fed0e04b8c54e6496b9ec36, type: 3}
 --- !u!114 &1449202816
 MonoBehaviour:
   m_ObjectHideFlags: 0
