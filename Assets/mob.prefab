@@ -178,7 +178,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   HP: 5
-  DeathSound: {fileID: 8300000, guid: 100dad92c07aa5845a4f0f49314af36c, type: 3}
+  DeathSound: {fileID: 8300000, guid: caec5a98cedd3b843a594e296b044f8e, type: 3}
 --- !u!212 &212585832009396310
 SpriteRenderer:
   m_ObjectHideFlags: 1
