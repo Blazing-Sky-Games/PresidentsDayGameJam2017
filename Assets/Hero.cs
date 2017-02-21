@@ -20,6 +20,7 @@ public class Hero : MonoBehaviour
 	public float		ScreenShakeTime;
     public float        HitStun;
     public AudioClip    HurtSound;
+    public Animator     Animator;
 
     // states for MonsterLove state machine
 
@@ -48,7 +49,7 @@ public class Hero : MonoBehaviour
 
 		m_audio = GetComponent<AudioSource>();
 
-		m_tranMuzzle = transform.FindChild ("muzzle");
+		m_tranMuzzle = GameObject.Find ("muzzle").transform;
     }
 
     void Start()
@@ -285,6 +286,8 @@ public class Hero : MonoBehaviour
         // if we are walking we are not moving in the y axis 
 
         m_vv = 0;
+
+        Animator.SetTrigger("run");
     }
 
     void Walk_Update()
@@ -310,6 +313,11 @@ public class Hero : MonoBehaviour
 
             m_fsm.ChangeState(HeroState.Fall);
         }
+    }
+
+    void Walk_Exit()
+    {
+        Animator.SetTrigger("notrun");
     }
 
     // jump state
