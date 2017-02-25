@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxJumpHeight: 20
   WalkSpeed: 48
-  TimeBetweenBullets: 0.08
+  TimeBetweenBullets: 0.04
   BulletPrefab: {fileID: 114165570688792538, guid: 7925e64c1155eea48b708a89768add26,
     type: 2}
   BulletSpeed: 200
